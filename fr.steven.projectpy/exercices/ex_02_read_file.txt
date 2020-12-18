@@ -1,0 +1,1 @@
+Given the file namelist.txt, count how many of each name there are in the file, and print out the results to the screen. 

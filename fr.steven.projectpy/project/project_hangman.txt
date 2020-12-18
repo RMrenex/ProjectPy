@@ -1,0 +1,30 @@
+In this project, you 'll have to build a hangman game where the player has the guess a word, letter by letter.
+The player should be allowed 6 wrong guesses until the player looses.
+
+Using the file words.txt, pick a random word and display it, but replace the characters by underscores.
+
+Then, prompt the player for a letter.
+
+If the letter is contained in the word, display the word again with the letter at the correct positions.
+
+If it isn't, decrement the number of guesses and tell the player how many wrong guesses are left remaining (or draw the hangman in ascii)
+
+An example interaction can look like this:
+
+>>> Welcome to Hangman!
+
+_ _ _ _ _ _ _ 
+
+>>> Guess your letter: S
+
+Incorrect! You have 5 more guesses...
+
+>>> Guess your letter: E
+
+E _ _ _ _ _ E
+
+[...]
+
+E L E V A T E
+
+Well done ! 

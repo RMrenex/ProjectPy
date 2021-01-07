@@ -1,10 +1,12 @@
 from math import sqrt
 
 import PyQt5.QtWidgets as qtw
+import keyboard
 
 
 class Calculator(qtw.QWidget):
     buttons = []
+    #history = []
 
     def __init__(self):
         super(Calculator, self).__init__()
@@ -12,6 +14,7 @@ class Calculator(qtw.QWidget):
         self.setLayout(qtw.QVBoxLayout())
         self.initkeyPad()
         self.initUI()
+        self.setFixedSize(410, 420)
         self.show()
 
     def initUI(self):
@@ -53,6 +56,7 @@ class Calculator(qtw.QWidget):
         btn_erase = qtw.QPushButton('←')
         btn_modulo = qtw.QPushButton('%')
         btn_squareRoot = qtw.QPushButton('√')
+        #btn_history = qtw.QPushButton("H", clicked=self.historyList)
 
         # Add buttons to list
         self.buttons.append(btn_0)
@@ -75,6 +79,7 @@ class Calculator(qtw.QWidget):
         self.buttons.append(btn_erase)
         self.buttons.append(btn_modulo)
         self.buttons.append(btn_squareRoot)
+        #self.buttons.append(btn_history)
 
         # add buttons event click
         btn_0.clicked.connect(lambda: self.onClick(btn_0))
@@ -127,6 +132,7 @@ class Calculator(qtw.QWidget):
         container.layout().addWidget(btn_divided, 5, 3)
 
         container.layout().addWidget(btn_enter, 6, 0, 1, 4)
+        #container.layout().addWidget(btn_history, 6, 3)
 
         self.layout().addWidget(container)
 
@@ -155,11 +161,13 @@ class Calculator(qtw.QWidget):
                 or self.result.text().__contains__("√") and self.result.text().__contains__("/") \
                 or self.result.text().__contains__("√") and self.result.text().__contains__("%"):
             self.result.setText("Erreur : impossible d'effectuer ce calcul")
+
         elif self.result.text().__eq__("√") or self.result.text().__eq__("*") or self.result.text().__eq__("/") \
                 or self.result.text().__eq__("+") or self.result.text().__eq__("-") or self.result.text().__eq__("%"):
             self.result.setText("Erreur : impossible d'effectuer ce calcul")
-        elif self.result.text().count("√") >= 2 or self.result.text().count("+") >= 2 or self.result.text().count("-") >=2 \
-                or self.result.text().count("*") >2 or self.result.text().count("/") >=2 or self.result.text().count("%") >= 2:
+
+        elif self.result.text().count("√") >= 2 or self.result.text().count("+") >= 2 or self.result.text().count("-") >= 2 \
+                or self.result.text().count("*") >=2 or self.result.text().count("/") >=2 or self.result.text().count("%") >= 2:
             self.result.setText("Erreur : calcul invalide")
 
     def calcul(self):
@@ -175,6 +183,7 @@ class Calculator(qtw.QWidget):
 
             res = number + number_2
             self.result.setText(str(res))
+            #self.history.append(f"{number} + {number_2} = {res}")
 
         elif self.result.text().__contains__("-"):
 

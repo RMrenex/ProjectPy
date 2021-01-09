@@ -1,7 +1,6 @@
 from math import sqrt
 
 import PyQt5.QtWidgets as qtw
-import keyboard
 
 
 class Calculator(qtw.QWidget):

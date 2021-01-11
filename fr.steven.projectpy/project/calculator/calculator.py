@@ -19,12 +19,13 @@ class Calculator(qtw.QWidget):
     def initUI(self):
         self.result.setStyleSheet("QLineEdit { "
                                   "border: 1px solid #ef233c; "
-                                  "color : #ef233c"
+                                  "color : #ef233c;"
+                                  "font-size: 15px;"
                                   "}")
         self.setStyleSheet("background-color: #2b2d42;")
         for btn in self.buttons:
             btn.setFlat(True)
-            btn.setStyleSheet("color: #ef233c; border: 1px solid #ef233c;")
+            btn.setStyleSheet("color: #ef233c; border: 1px solid #ef233c; font-size: 15px;")
 
     def initkeyPad(self):
         container = qtw.QWidget()

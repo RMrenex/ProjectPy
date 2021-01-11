@@ -99,7 +99,7 @@ class Apps(qtw.QWidget):
 
         self.layout().addWidget(newTodoContainer)
 
-        if self.todos:
+        """if self.todos:
 
             for i in range(len(self.todos)):
                 todoContainer = qtw.QWidget()
@@ -129,7 +129,7 @@ class Apps(qtw.QWidget):
                 label = qtw.QLabel(self.todos[i].getLabel())
                 todoContainer.layout().addWidget(label)
 
-                self.layout().addWidget(todoContainer)
+                self.layout().addWidget(todoContainer)"""
 
     def removeTodo(self, data=None):
 
@@ -178,6 +178,8 @@ class Apps(qtw.QWidget):
                 checkbox = qtw.QCheckBox()
                 todoContainer.layout().addWidget(checkbox)
 
+                checkbox.stateChanged.connect(self.checkboxStateChanged)
+
                 labeltext = qtw.QLabel(label.text())
                 todoContainer.layout().addWidget(labeltext)
 
@@ -218,11 +220,8 @@ class Apps(qtw.QWidget):
             if self.todos[i].getCheckBox():
 
                 self.todos[i].setState(self.todos[i].getCheckBox().isChecked())
-
-                for element in json_todos:
-                    print(element["label"])
-
-                # FileManager.save()
+                json_todos[i]["state"] = self.todos[i].getCheckBox().isChecked()
+                FileManager().save()
 
     def initTodo(self):
 

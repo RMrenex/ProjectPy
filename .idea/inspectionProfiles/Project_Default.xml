@@ -28,6 +28,7 @@
         <list>
           <option value="PyQt5.QtWidgets.clicked.connect" />
           <option value="tuple.append" />
+          <option value="dict.__add__" />
         </list>
       </option>
     </inspection_tool>

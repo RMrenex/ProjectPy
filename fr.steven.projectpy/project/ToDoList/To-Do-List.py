@@ -1,24 +1,18 @@
 import json
-import os
-import sys
-from distutils.command.build_py import build_py_2to3
 
 import PyQt5.QtWidgets as qtw
 
 initial_todos = []
+json_todos = []
 
 
 class Todo:
 
-    def __init__(self, label: str, state: bool):
+    def __init__(self, label: str, state: bool, checkbox: qtw.QCheckBox = None, button: qtw.QPushButton = None):
         self.label_ = label
         self.state_ = state
-        self.checkbox_ = ""
-        self.button_ = ""
-
-    def removeTodo(self, todoList, todo):
-        print(todo.label_)
-        # todoList.remove(todo)
+        self.checkbox_ = checkbox
+        self.button_ = button
 
     def getLabel(self):
         return self.label_
@@ -38,8 +32,8 @@ class Todo:
     def setState(self, state):
         self.state_ = state
 
-    def setCheckBox(self, checbox):
-        self.checkbox_ = checbox
+    def setCheckBox(self, checkbox):
+        self.checkbox_ = checkbox
 
     def setButton(self, button):
         self.button_ = button
@@ -47,25 +41,34 @@ class Todo:
     def __str__(self):
         return f"{self.label_} {self.state_}"
 
+    def toJson(self):
+        return {
+            "label": self.label_,
+            "state": self.state_,
+            "checkbox": f"{self.checkbox_}",
+            "button": f"{self.button_}"
+        }
+
 
 class FileManager:
     fileName = "data.json"
 
     def loadFile(self):
         try:
+
             file = open(self.fileName, "r")
             todo = json.load(file)
             file.close()
             return todo
         except FileNotFoundError:
             file = open(self.fileName, "w")
-            json.dump("", file)
+            json.dump([], file)
             file.close()
             return []
 
-    def save(self, todo):
+    def save(self):
         file = open(self.fileName, "w")
-        json.dump(todo, file)
+        json.dump(json_todos, file)
         file.close()
 
 
@@ -74,7 +77,6 @@ class Apps(qtw.QWidget):
 
     def __init__(self):
         super(Apps, self).__init__()
-        # self.file.loadFile()
         self.initTodo()
         self.todos = initial_todos
         self.setWindowTitle("ToDoApps")
@@ -93,47 +95,64 @@ class Apps(qtw.QWidget):
         labelInput = qtw.QLineEdit()
         newTodoContainer.layout().addWidget(labelInput)
 
-        buttonAdd.clicked.connect(lambda: self.addTodo(labelInput.text()))
+        buttonAdd.clicked.connect(lambda: self.addTodo(labelInput))
 
         self.layout().addWidget(newTodoContainer)
 
-        for i in range(len(self.todos)):
-            todoContainer = qtw.QWidget()
-            todoContainer.setLayout(qtw.QHBoxLayout())
+        if self.todos:
 
-            # Button remove
-            button = qtw.QPushButton("Remove")
-            button.setObjectName(f"bt{i}")
-            self.todos[i].setButton(button)
-            todoContainer.layout().addWidget(button)
-            button.clicked.connect(self.removeTodo)
+            for i in range(len(self.todos)):
+                todoContainer = qtw.QWidget()
+                todoContainer.setLayout(qtw.QHBoxLayout())
 
-            checkbox = qtw.QCheckBox()
-            # initialiser les checkbox
-            checkbox.setChecked(self.todos[i].getState())
-            todoContainer.layout().addWidget(checkbox)
-            # Add CheckBox Object
-            self.todos[i].setCheckBox(checkbox)
-            # Update State
-            checkbox.stateChanged.connect(self.checkboxStateChanged)
+                # Button remove
+                button = qtw.QPushButton("Remove")
+                button.setObjectName(f"bt{i}")
+                self.todos[i].setButton(button)
 
-            # label
-            label = qtw.QLabel(self.todos[i].getLabel())
-            todoContainer.layout().addWidget(label)
+                todoContainer.layout().addWidget(button)
 
-            self.layout().addWidget(todoContainer)
+                button.clicked.connect(self.removeTodo)
+
+                checkbox = qtw.QCheckBox()
+                # initialiser les checkbox
+                checkbox.setChecked(self.todos[i].getState())
+                todoContainer.layout().addWidget(checkbox)
+
+                # Add CheckBox Object
+                self.todos[i].setCheckBox(checkbox)
+
+                # Update State
+                checkbox.stateChanged.connect(self.checkboxStateChanged)
+
+                # label
+                label = qtw.QLabel(self.todos[i].getLabel())
+                todoContainer.layout().addWidget(label)
+
+                self.layout().addWidget(todoContainer)
 
     def removeTodo(self, data=None):
 
+        """print(len(self.todos))
+        self.todos.pop(0)
+        print(len(self.todos))"""
+
         if not data:
+
             target = self.sender()
             data = target.objectName()
+            index = 0
 
-            for i in range(len(self.todos)):
+            for todo in self.todos:
 
-                if self.todos[i].getButton().objectName() == data:
-
+                if todo.getButton().objectName() == data:
                     self.layout().removeWidget(target.parentWidget())
+                    self.todos.remove(todo)
+
+                    json_todos.pop(index)
+                    FileManager().save()
+
+                index += 1
 
     def addTodo(self, label):
 
@@ -142,33 +161,42 @@ class Apps(qtw.QWidget):
         error.setText("Error")
         error.setWindowTitle("Error")
 
-        if label != "":
+        if label.text() != "":
 
-            if not self.todoIsPresent(label):
+            if not self.todoIsPresent(label.text()):
 
-                todo = Todo(label, False)
+                todo = Todo(label.text(), False)
 
                 todoContainer = qtw.QWidget()
                 todoContainer.setLayout(qtw.QHBoxLayout())
 
                 buttonRemove = qtw.QPushButton("Remove")
-                # Get last id and set here
                 buttonRemove.setObjectName(f"bt{(len(self.todos) - 1) + 1}")
                 todoContainer.layout().addWidget(buttonRemove)
+                buttonRemove.clicked.connect(self.removeTodo)
 
                 checkbox = qtw.QCheckBox()
                 todoContainer.layout().addWidget(checkbox)
 
-                labeltext = qtw.QLabel(label)
+                labeltext = qtw.QLabel(label.text())
                 todoContainer.layout().addWidget(labeltext)
 
                 self.layout().addWidget(todoContainer)
 
+                todo.setButton(buttonRemove)
+                todo.setCheckBox(checkbox)
                 self.todos.append(todo)
+
+                json_todos.append(todo.toJson())
+
+                FileManager().save()
+
+                label.setText("")
 
             else:
                 error.setInformativeText('Todo is already present')
                 error.exec()
+                label.setText("")
 
         else:
             error.setInformativeText('Label cannot not be null')
@@ -186,20 +214,41 @@ class Apps(qtw.QWidget):
     def checkboxStateChanged(self):
 
         for i in range(len(self.todos)):
+
             if self.todos[i].getCheckBox():
+
                 self.todos[i].setState(self.todos[i].getCheckBox().isChecked())
 
-            print(self.todos[i].getState())
+                for element in json_todos:
+                    print(element["label"])
+
+                # FileManager.save()
 
     def initTodo(self):
 
-        task = Todo("Faire a manger", True)
+        """file = FileManager()
+        json_object = file.loadFile()
+
+        for element in json_object:
+            initial_todos.append(Todo(element["label"], element["state"], element["checkbox"], element["button"]))"""
+
+        file = FileManager()
+        json_object = file.loadFile()
+
+        if not json_object == []:
+
+            json_todos.append(json_object)
+
+            for element in json_object:
+                initial_todos.append(Todo(element["label"], element["state"], element["checkbox"], element["button"]))
+
+        """task = Todo("Faire a manger", True)
         task_2 = Todo("Faire ses devoirs", False)
         task_3 = Todo("Sortir le chien", True)
 
         initial_todos.append(task)
         initial_todos.append(task_2)
-        initial_todos.append(task_3)
+        initial_todos.append(task_3)"""
 
 
 def launch():

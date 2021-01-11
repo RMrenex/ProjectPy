@@ -39,9 +39,6 @@ class Todo:
     def setButton(self, button):
         self.button_ = button
 
-    def __str__(self):
-        return f"{self.label_} {self.state_}"
-
     def toJson(self):
         return {
             "label": self.label_,
@@ -74,7 +71,6 @@ class FileManager:
 
 
 class Apps(qtw.QWidget):
-
     file = FileManager()
 
     def __init__(self):
@@ -88,13 +84,22 @@ class Apps(qtw.QWidget):
 
     def initUI(self):
 
+        self.setStyleSheet("background-color: #f4d58d;")
+
         newTodoContainer = qtw.QWidget()
         newTodoContainer.setLayout(qtw.QHBoxLayout())
 
         buttonAdd = qtw.QPushButton("Add")
+        buttonAdd.setFlat(True)
+        buttonAdd.setStyleSheet("color: #001427; border: 3px solid #001427; width: 50px; font-size: 15px;")
         newTodoContainer.layout().addWidget(buttonAdd)
 
         labelInput = qtw.QLineEdit()
+        labelInput.setStyleSheet("QLineEdit { "
+                                 "border: 3px solid #001427; "
+                                 "color : #001427;"
+                                 "font-size: 15px;"
+                                 "}")
         newTodoContainer.layout().addWidget(labelInput)
 
         buttonAdd.clicked.connect(lambda: self.addTodo(labelInput))
@@ -104,25 +109,27 @@ class Apps(qtw.QWidget):
         if self.todos:
 
             for i in range(len(self.todos)):
-
                 todoContainer = qtw.QWidget()
                 todoContainer.setLayout(qtw.QHBoxLayout())
 
-                #Button
+                # Button
                 button = qtw.QPushButton("Remove")
+                button.setFlat(True)
+                button.setStyleSheet("color: #001427; border: 3px solid #001427; width: 50px; font-size: 15px;")
                 button.setObjectName(f"bt{i}")
                 self.todos[i].setButton(button)
                 todoContainer.layout().addWidget(button)
                 button.clicked.connect(self.removeTodo)
 
-                #Checkbox
+                # Checkbox
                 checkbox = qtw.QCheckBox()
                 checkbox.setChecked(self.todos[i].getState())
                 todoContainer.layout().addWidget(checkbox)
                 self.todos[i].setCheckBox(checkbox)
 
-                # label
+                # Label
                 label = qtw.QLabel(self.todos[i].getLabel())
+                label.setStyleSheet("border-bottom: 3px solid #001427; font-size: 15px;")
                 todoContainer.layout().addWidget(label)
 
                 self.layout().addWidget(todoContainer)
@@ -131,25 +138,19 @@ class Apps(qtw.QWidget):
 
             FileManager().save()
 
-        else:
+        """else:
 
-            labelContainer = qtw.QWidget()
-            labelContainer.setLayout(qtw.QHBoxLayout())
+            self.labelContainer = qtw.QWidget()
+            self.labelContainer.setLayout(qtw.QHBoxLayout())
 
-            label = qtw.QLabel("No todo for the moment")
-            label.setAlignment(Qt.AlignCenter)
-            labelContainer.layout().addWidget(label)
-
-            self.layout().addWidget(label)
+            labelNone = qtw.QLabel("No todo for the moment")
+            labelNone.setAlignment(Qt.AlignCenter)
+            self.labelContainer.layout().addWidget(labelNone)
+            self.layout().addWidget(self.labelContainer)"""
 
     def removeTodo(self, data=None):
 
-        """print(len(self.todos))
-        self.todos.pop(0)
-        print(len(self.todos))"""
-
         if not data:
-
 
             target = self.sender()
             data = target.objectName()
@@ -186,6 +187,8 @@ class Apps(qtw.QWidget):
                 todoContainer.setLayout(qtw.QHBoxLayout())
 
                 buttonRemove = qtw.QPushButton("Remove")
+                buttonRemove.setFlat(True)
+                buttonRemove.setStyleSheet("color: #001427; border: 3px solid #001427; width: 50px; font-size: 15px;")
                 buttonRemove.setObjectName(f"bt{(len(self.todos) - 1) + 1}")
                 todoContainer.layout().addWidget(buttonRemove)
                 buttonRemove.clicked.connect(self.removeTodo)
@@ -196,6 +199,7 @@ class Apps(qtw.QWidget):
                 checkbox.stateChanged.connect(self.checkboxStateChanged)
 
                 labeltext = qtw.QLabel(label.text())
+                labeltext.setStyleSheet("border-bottom: 3px solid #001427; font-size: 15px;")
                 todoContainer.layout().addWidget(labeltext)
 
                 self.layout().addWidget(todoContainer)
@@ -209,8 +213,6 @@ class Apps(qtw.QWidget):
                 FileManager().save()
 
                 label.setText("")
-
-
 
             else:
                 error.setInformativeText('Todo is already present')
@@ -235,28 +237,18 @@ class Apps(qtw.QWidget):
         for i in range(len(self.todos)):
 
             if self.todos[i].getCheckBox():
-
                 self.todos[i].setState(self.todos[i].getCheckBox().isChecked())
                 json_todos[i]["state"] = self.todos[i].getCheckBox().isChecked()
                 FileManager().save()
 
     def initTodo(self):
 
-        """file = FileManager()
-        json_object = file.loadFile()
-
-        for element in json_object:
-            initial_todos.append(Todo(element["label"], element["state"], element["checkbox"], element["button"]))"""
-
         file = FileManager()
         json_object = file.loadFile()
 
         if not json_object == []:
 
-            #json_todos.append(json_object)
-
             for element in json_object:
-
                 initial_todos.append(Todo(element["label"], element["state"], element["checkbox"], element["button"]))
 
 

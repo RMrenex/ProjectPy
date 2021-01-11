@@ -1,7 +1,6 @@
 import json
 
 import PyQt5.QtWidgets as qtw
-from PyQt5.QtCore import Qt
 
 initial_todos = []
 json_todos = []
@@ -125,6 +124,7 @@ class Apps(qtw.QWidget):
                 checkbox = qtw.QCheckBox()
                 checkbox.setChecked(self.todos[i].getState())
                 todoContainer.layout().addWidget(checkbox)
+                checkbox.stateChanged.connect(self.checkboxStateChanged)
                 self.todos[i].setCheckBox(checkbox)
 
                 # Label

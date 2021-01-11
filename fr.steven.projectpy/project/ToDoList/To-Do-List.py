@@ -1,6 +1,7 @@
 import json
 
 import PyQt5.QtWidgets as qtw
+from PyQt5.QtCore import Qt
 
 initial_todos = []
 json_todos = []
@@ -73,6 +74,7 @@ class FileManager:
 
 
 class Apps(qtw.QWidget):
+
     file = FileManager()
 
     def __init__(self):
@@ -99,37 +101,46 @@ class Apps(qtw.QWidget):
 
         self.layout().addWidget(newTodoContainer)
 
-        """if self.todos:
+        if self.todos:
 
             for i in range(len(self.todos)):
+
                 todoContainer = qtw.QWidget()
                 todoContainer.setLayout(qtw.QHBoxLayout())
 
-                # Button remove
+                #Button
                 button = qtw.QPushButton("Remove")
                 button.setObjectName(f"bt{i}")
                 self.todos[i].setButton(button)
-
                 todoContainer.layout().addWidget(button)
-
                 button.clicked.connect(self.removeTodo)
 
+                #Checkbox
                 checkbox = qtw.QCheckBox()
-                # initialiser les checkbox
                 checkbox.setChecked(self.todos[i].getState())
                 todoContainer.layout().addWidget(checkbox)
-
-                # Add CheckBox Object
                 self.todos[i].setCheckBox(checkbox)
-
-                # Update State
-                checkbox.stateChanged.connect(self.checkboxStateChanged)
 
                 # label
                 label = qtw.QLabel(self.todos[i].getLabel())
                 todoContainer.layout().addWidget(label)
 
-                self.layout().addWidget(todoContainer)"""
+                self.layout().addWidget(todoContainer)
+
+                json_todos.append(self.todos[i].toJson())
+
+            FileManager().save()
+
+        else:
+
+            labelContainer = qtw.QWidget()
+            labelContainer.setLayout(qtw.QHBoxLayout())
+
+            label = qtw.QLabel("No todo for the moment")
+            label.setAlignment(Qt.AlignCenter)
+            labelContainer.layout().addWidget(label)
+
+            self.layout().addWidget(label)
 
     def removeTodo(self, data=None):
 
@@ -138,6 +149,7 @@ class Apps(qtw.QWidget):
         print(len(self.todos))"""
 
         if not data:
+
 
             target = self.sender()
             data = target.objectName()
@@ -149,8 +161,11 @@ class Apps(qtw.QWidget):
                     self.layout().removeWidget(target.parentWidget())
                     self.todos.remove(todo)
 
-                    json_todos.pop(index)
-                    FileManager().save()
+                    try:
+                        json_todos.pop(index)
+                        FileManager().save()
+                    except IndexError:
+                        print("Index bound of exception")
 
                 index += 1
 
@@ -195,6 +210,8 @@ class Apps(qtw.QWidget):
 
                 label.setText("")
 
+
+
             else:
                 error.setInformativeText('Todo is already present')
                 error.exec()
@@ -236,18 +253,11 @@ class Apps(qtw.QWidget):
 
         if not json_object == []:
 
-            json_todos.append(json_object)
+            #json_todos.append(json_object)
 
             for element in json_object:
+
                 initial_todos.append(Todo(element["label"], element["state"], element["checkbox"], element["button"]))
-
-        """task = Todo("Faire a manger", True)
-        task_2 = Todo("Faire ses devoirs", False)
-        task_3 = Todo("Sortir le chien", True)
-
-        initial_todos.append(task)
-        initial_todos.append(task_2)
-        initial_todos.append(task_3)"""
 
 
 def launch():
